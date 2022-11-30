@@ -1,0 +1,758 @@
+{
+	"info": {
+		"_postman_id": "d40b9618-e821-4666-8663-481f422419e8",
+		"name": "RenastechC6-API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18869877"
+	},
+	"item": [
+		{
+			"name": "Status",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// my status code is 200\r",
+							"// status is OK\r",
+							"//The language we used here is javascript\r",
+							"// We are not allowed to use different HTTP methods with same endpoint\r",
+							"\r",
+							"//we check status code here\r",
+							"pm.test(\"Status code is 200\", function(){\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"//Does response includes \"OK\"\r",
+							"pm.test(\"Response should contation\", function(){\r",
+							"pm.expect(pm.response.text()).to.include(\"OK\");\r",
+							"});\r",
+							"\r",
+							"//Const stands for String in javascript\r",
+							"const response = pm.response.json(); // We are saving response of this call here\r",
+							"console.log(response);// This will print response in console\r",
+							"console.log(response.status); // This will only print value for \"Status\"\r",
+							"\r",
+							"pm.test('Response should contain status and it should be equal to OK', ()=>\r",
+							"{\r",
+							"    pm.expect(response.status).to.eql('OK');\r",
+							"});\r",
+							"\r",
+							"//Given The user wants to hit Status Endpoint\r",
+							"//When The user wants to make a get call\r",
+							"//Then The user expect that response to have \"OK\" as status message\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.request.addHeader(\"test:test123\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Test",
+						"value": "test123",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{URL}}/status",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"status"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List of Books",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function(){\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// constant => String in Javascript\r",
+							"\r",
+							"//Save the response as Json in to variable\r",
+							"const response = pm.response.json();\r",
+							"\r",
+							"//2.task how can we get id of first book from response body\r",
+							"const firstBookId=response[0].id;\r",
+							"const firstBookName=response[0].name;\r",
+							"console.log('First book id:'+firstBookId+' first Book Name: '+firstBookName);\r",
+							"\r",
+							"pm.collectionVariables.set(\"firstBookId\",firstBookId);\r",
+							"pm.collectionVariables.set(\"firstBookName\",firstBookName);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/books",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"books"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Retrieve Single Book Information",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function(){\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"//We save response here\r",
+							"const response= pm.response.json();\r",
+							"\r",
+							"//We save actual name\r",
+							"const name=response.name;\r",
+							"\r",
+							"//We save expected name from Postman Variables\r",
+							"const expectedName= pm.variables.get('firstBookName');\r",
+							"\r",
+							"//We compare both actual and expected names\r",
+							"pm.test('Verify book Name',()=>{\r",
+							"pm.expect(name).to.eql(expectedName);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/books/{{firstBookId}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"books",
+						"{{firstBookId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Security Pass",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function(){\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"//Task: Save accessToken as a collection variable\r",
+							"\r",
+							"const response=pm.response.json();\r",
+							"\r",
+							"const accessToken=response.accessToken;\r",
+							"\r",
+							"pm.collectionVariables.set(\"accessToken\",accessToken);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"clientName\":\"{{$randomFullName}}\",\r\n    \"clientEmail\":\"{{$randomEmail}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/api-clients",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"api-clients"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Security Pass #negative",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// status code should be 409\r",
+							"\r",
+							"//Test Case #1\r",
+							"//Test Scenario for Negative Path\r",
+							"//Given that The user wants to use same email address twice\r",
+							"//When The user wants to make a call\r",
+							"//Then The user should receive 409 status code\r",
+							"//And The user receive error message\r",
+							"\r",
+							"pm.test(\"Status code is 409\", function(){\r",
+							"    pm.response.to.have.status(409);\r",
+							"});\r",
+							"\r",
+							"const response=pm.response.json();\r",
+							"const actualMsg=response.error;\r",
+							"\r",
+							"const expectedMsg=\"API client already registered. Try a different email.\";\r",
+							"\r",
+							"pm.test('Validate error message', ()=>{\r",
+							"    pm.expect(expectedMsg).to.eql(actualMsg);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"clientName\":\"{{$randomFullName}}\",\r\n    \"clientEmail\":\"failTestFail@renastech.com\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/api-clients",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"api-clients"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Order a book(if book is available)",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set (\"randomNum\", _.random (1,6));\r",
+							"//This enables us to test with different data\r",
+							"//This code will trigger before we make the call"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//This will get triggered after we make the call\r",
+							"pm.test(\"Status code is 201\", function(){\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"// This is positive scenario - Verify status code and created should be true\r",
+							"\r",
+							"const response=pm.response.json();\r",
+							"const actualCreatedValue=response.created;\r",
+							"\r",
+							"const orderId=response.orderId;\r",
+							"\r",
+							"const expectedCreatedValue= true;\r",
+							"\r",
+							"pm.test('Validate if created is true', ()=>{\r",
+							"pm.expect(expectedCreatedValue).to.eql(actualCreatedValue);\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set(\"orderId\", orderId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"bookId\": {{randomNum}},\r\n    \"customerName\":\"{{$randomFullName}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/orders",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Order a Book (If Book is not available)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 404\", function(){\r",
+							"    pm.response.to.have.status(404);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"// Task - Validate Status code and error message\r",
+							"\r",
+							"const response=pm.response.json();\r",
+							"const actualMSG=response.error;\r",
+							"\r",
+							"const expectedMSg=\"This book is not in stock. Try again later.\";\r",
+							"\r",
+							"pm.test('Validate error message', ()=>{\r",
+							"    pm.expect(expectedMSg).to.eql(actualMSG);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"bookId\": 2,\r\n    \"customerName\":\"Bahar\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/orders",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List of the Orders",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function(){\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/orders",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List of the Order (If no Auth)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/orders",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"orders"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Retrieve One order #negative",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 404\", function(){\r",
+							"    pm.response.to.have.status(404);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"const response=pm.response.json();\r",
+							"\r",
+							"const actualMsg=response.error;\r",
+							"\r",
+							"\r",
+							"const expectedMsg=\"No order with id 156489.\";\r",
+							"\r",
+							"\r",
+							"pm.test('Validate error message',()=>{\r",
+							"    pm.expect(expectedMsg).to.eql(actualMsg);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "1867ea53c6fc4a41ff475cecb122a4b1b8f430fb8d434f1920bc3e4f28ceae3f",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/orders/:bookId",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"orders",
+						":bookId"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					],
+					"variable": [
+						{
+							"key": "bookId",
+							"value": "156489"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Retrieve One Order - Happy Path 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function(){\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/orders/SbtP8BBhts8qaTY_p1DqX",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"orders",
+						"SbtP8BBhts8qaTY_p1DqX"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Retrieve One order - Happy Path 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function(){\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/orders/:orderId",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"orders",
+						":orderId"
+					],
+					"variable": [
+						{
+							"key": "orderId",
+							"value": "{{orderId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Order",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"customerName\":\"Yaseen\"\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/orders/:orderId",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"orders",
+						":orderId"
+					],
+					"variable": [
+						{
+							"key": "orderId",
+							"value": "{{orderId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete an Order",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{accessToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/orders/:orderId",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"orders",
+						":orderId"
+					],
+					"variable": [
+						{
+							"key": "orderId",
+							"value": "{{orderId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "URL",
+			"value": "https://simple-books-api.glitch.me",
+			"type": "string"
+		},
+		{
+			"key": "firstBookId",
+			"value": ""
+		},
+		{
+			"key": "firstBookName",
+			"value": ""
+		},
+		{
+			"key": "accessToken",
+			"value": ""
+		},
+		{
+			"key": "randomNum",
+			"value": ""
+		},
+		{
+			"key": "orderId",
+			"value": ""
+		}
+	]
+}
