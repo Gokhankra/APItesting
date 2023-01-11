@@ -37,7 +37,8 @@ public class RequestWithQueryParam {
         System.out.println(bookname);
         System.out.println(response.jsonPath().getString("[1].id"));
         Assert.assertEquals(response.jsonPath().getString("[1].id"),"3");
-        System.out.println(response.getTime());
+        System.out.println(response
+                .getTime());
     }
 
 
